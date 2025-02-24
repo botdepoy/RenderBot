@@ -11,6 +11,11 @@ CHAT_ID = "8101143576"  # Your Telegram ID or group ID
 # Initialize Telegram bot
 bot = Bot(token=BOT_TOKEN)
 
+# Route for the root URL
+@app.route("/", methods=["GET"])
+def home():
+    return "Telegram Bot Backend is Running 🚀"
+
 # Route to handle form submission
 @app.route("/submit", methods=["POST"])
 def submit_form():
