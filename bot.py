@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 BOT_TOKEN = "7680394855:AAFVjKErGVwWg9bZ49BnChVgCLnv1xA3MRw"
 
 # Web App URL
-WEB_APP_URL = "https://botdepoy.github.io/telegrambot/form.html"
+WEB_APP_URL = "https://botdepoy.github.io/RenderBot/form.html"
 
 # Start command
 async def start(update: Update, context: CallbackContext) -> None:
