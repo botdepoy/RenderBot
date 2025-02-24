@@ -1,58 +1,65 @@
-from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
-from telegram.ext import Application, CommandHandler, CallbackContext
-import logging
+from flask import Flask, request, jsonify
+import requests
 
-# Enable logging
-logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO)
-logger = logging.getLogger(__name__)
+app = Flask(__name__)
 
-# Replace with your actual Telegram bot token
-BOT_TOKEN = "7680394855:AAFVjKErGVwWg9bZ49BnChVgCLnv1xA3MRw"
+# Replace with your bot token and Telegram ID
+BOT_TOKEN = '7680394855:AAFVjKErGVwWg9bZ49BnChVgCLnv1xA3MRw'
+TELEGRAM_ID = '8101143576'  # Your Telegram ID to receive form data
+TELEGRAM_API_URL = f'https://api.telegram.org/bot{BOT_TOKEN}/'
 
-# Web App URL
-WEB_APP_URL = "https://botdepoy.github.io/RenderBot/form.html"
+# Start command handler
+@app.route('/webhook', methods=['POST'])
+def webhook():
+    data = request.json
+    chat_id = data['message']['chat']['id']
+    text = data['message'].get('text', '')
 
-# Start command
-async def start(update: Update, context: CallbackContext) -> None:
-    """Handles /start command and displays a menu with multiple buttons."""
-    # Create an inline keyboard with multiple buttons
-    keyboard = [
-        [InlineKeyboardButton("填写信息 (Fill Form)", web_app={"url": WEB_APP_URL})],
-        [InlineKeyboardButton("帮助 (Help)", callback_data="help")],
-        [InlineKeyboardButton("关于我们 (About Us)", callback_data="about")],
-    ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
+    if text == '/start':
+        # Send a message with a button to show the form
+        show_form_button = {
+            'text': 'Welcome! Click the button below to fill out the form.',
+            'reply_markup': {
+                'inline_keyboard': [[
+                    {
+                        'text': 'Show Form',
+                        'web_app': {'url': 'https://your-github-page-url.com/form.html'}  # Replace with your form URL
+                    }
+                ]]
+            }
+        }
+        send_message(chat_id, show_form_button)
+    return jsonify({'status': 'ok'})
 
-    # Send the message with the buttons
-    await update.message.reply_text(
-        "请选择一个选项 (Please choose an option):",
-        reply_markup=reply_markup,
+# Function to send a message
+def send_message(chat_id, message_data):
+    url = TELEGRAM_API_URL + 'sendMessage'
+    payload = {
+        'chat_id': chat_id,
+        'text': message_data.get('text', ''),
+        'reply_markup': json.dumps(message_data.get('reply_markup', {}))
+    }
+    requests.post(url, json=payload)
+
+# Function to handle form data submission
+@app.route('/submit-form', methods=['POST'])
+def submit_form():
+    form_data = request.json
+    user_info = form_data.get('user_info', {})
+    service = form_data.get('service', '')
+
+    # Prepare the message to send to your Telegram ID
+    message = (
+        f"New Form Submission:\n\n"
+        f"Name: {user_info.get('name', 'N/A')}\n"
+        f"Username: {user_info.get('username', 'N/A')}\n"
+        f"Service: {service}"
     )
 
-# Callback query handler
-async def button_callback(update: Update, context: CallbackContext) -> None:
-    """Handles button callbacks."""
-    query = update.callback_query
-    await query.answer()
+    # Send the form data to your Telegram ID
+    send_message(TELEGRAM_ID, {'text': message})
 
-    if query.data == "help":
-        await query.edit_message_text("帮助信息 (Help information):\n\n如有问题，请联系管理员。")
-    elif query.data == "about":
-        await query.edit_message_text("关于我们 (About Us):\n\n这是一个示例Telegram机器人。")
+    return jsonify({'status': 'ok'})
 
-# Main function to start the bot
-def main() -> None:
-    # Initialize the bot
-    application = Application.builder().token(BOT_TOKEN).build()
-
-    # Add command handler for /start
-    application.add_handler(CommandHandler("start", start))
-
-    # Add callback query handler for button clicks
-    application.add_handler(CallbackQueryHandler(button_callback))
-
-    # Start the bot
-    application.run_polling()
-
-if __name__ == "__main__":
-    main()
+if __name__ == '__main__':
+    app.run(port=5000)
