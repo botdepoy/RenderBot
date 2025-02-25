@@ -7,7 +7,7 @@ app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
 
 # Replace with your actual Telegram bot token and chat ID
-BOT_TOKEN = "7680394855:AAFVjKErGVwWg9bZ49BnChVgCLnv1xA3MRw"
+BOT_TOKEN = "7892503550:AAHczDCOpkPQSlq_v48xYfnKiBUM592BXXM"
 CHAT_ID = "8101143576"  # Your Telegram ID or group ID
 
 # Initialize Telegram bot
