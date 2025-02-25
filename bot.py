@@ -4,7 +4,7 @@ import requests
 app = Flask(__name__)
 
 # Replace with your bot token and Telegram ID
-BOT_TOKEN = '7680394855:AAFVjKErGVwWg9bZ49BnChVgCLnv1xA3MRw'
+BOT_TOKEN = '7892503550:AAHczDCOpkPQSlq_v48xYfnKiBUM592BXXM'
 TELEGRAM_ID = '8101143576'  # Your Telegram ID to receive form data
 TELEGRAM_API_URL = f'https://api.telegram.org/bot{BOT_TOKEN}/'
 
